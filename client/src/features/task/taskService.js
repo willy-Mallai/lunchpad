@@ -1,5 +1,5 @@
 import axios from "axios";
-const API_URL = import.meta.env.VITE_API_URL + "/task";
+const API_URL = (import.meta.env.VITE_API_URL || "") + "/task";
 export const getTask = async () => {
   try {
     const res = await axios.get(`${API_URL}/get-task`, {

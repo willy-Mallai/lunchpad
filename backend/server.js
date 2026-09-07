@@ -10,26 +10,39 @@ const roadmapRouter = require("./routes/roadmapRoute");
 require("dotenv").config();
 const app = express();
 app.use(express.json());
-const allowedOrigins = ["http://localhost:5173", process.env.FRONTEND_URL];
-app.use(cors({ 
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  }, 
-  credentials: true 
-}));
+const allowedOrigins = ["http://localhost:5175", process.env.FRONTEND_URL];
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  }),
+);
 app.use(cookieParser());
 
 const Port = process.env.PORT || 8080;
+
+const path = require("path");
 
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/task", taskRouter);
 app.use("/event", eventRouter);
 app.use("/roadmap", roadmapRouter);
+
+// Serve frontend static files in production
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../client/dist")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "../client/dist", "index.html"));
+  });
+}
 
 async function startServer() {
   try {

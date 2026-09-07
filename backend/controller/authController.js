@@ -33,16 +33,11 @@ const register = async (req, res) => {
     // 5. Hash the password using bcrypt.hash()
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 6. Generate a random 6-digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    // 7. Create a new user instance using your userModel and the hashed password
+    // 6. Create a new user instance using your userModel and the hashed password
     const newUser = await userModel.create({
       name,
       email,
       password: hashedPassword,
-      verifyOtp: otp,
-      verifyOtpExpireAt: Date.now() + 15 * 60 * 1000,
     });
 
     // 8. Generate a JWT token using the new user's ID
@@ -58,14 +53,10 @@ const register = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    // 10. Attempt to send the OTP email automatically
-
-    await sendVerifyOtpEmail(newUser.email, otp);
-
-    // 11. Return a success response
+    // 10. Return a success response
     res.status(201).json({
       success: true,
-      message: "Register Successfully. Please check your email for the OTP.",
+      message: "Register Successfully",
       email: newUser.email,
     });
   } catch (error) {
@@ -128,6 +119,9 @@ const login = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Login Successfully",
+      email: user.email,
+      name: user.name,
+      isAccountVerified: user.isAccountVerified,
     });
   } catch (error) {
     // 10. Catch any server errors and return a 500 status
@@ -253,7 +247,7 @@ const verifyEmail = async (req, res) => {
 
     user.isAccountVerified = true;
     user.verifyOtp = "";
-    user.verifyOtpExpireAt = "";
+    user.verifyOtpExpireAt = 0;
     await user.save();
 
     res.status(200).json({
@@ -280,11 +274,18 @@ const isAuthenticated = async (req, res) => {
     // Note: You will protect this route with your 'userAuth' middleware!
     // Because of that, this controller ONLY runs if the token was 100% valid.
     // 1. Since they made it here, they are definitely authenticated!
-    // Simply return a 200 success response (e.g., { success: true })
+    const user = await userModel.findById(req.userId);
+    if (!user) {
+      return res.status(401).json({ success: false, message: "User not found" });
+    }
+    
+    // Simply return a 200 success response with the user data
     res.json({
       success: true,
+      email: user.email,
+      name: user.name,
+      isAccountVerified: user.isAccountVerified,
     });
-    // The frontend will use this to check if the session is still active on page refresh.
   } catch (error) {
     // 2. Catch any server errors and return a 500 status code
     res.status(500).json({

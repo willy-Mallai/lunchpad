@@ -29,8 +29,8 @@ export default function Login() {
         navigate("/dashboard");
       } else {
         await register(name, email, password);
-        // Navigate to verify email page so they can verify their account
-        navigate("/verify-email");
+        // Navigate directly to dashboard so they aren't forced to verify immediately
+        navigate("/dashboard");
       }
     } catch (err) {
       setLocalError(err.message || "Authentication failed");

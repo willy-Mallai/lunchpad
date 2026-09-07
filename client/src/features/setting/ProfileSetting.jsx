@@ -1,8 +1,29 @@
 import ProfileInfoForm from "./ProfileInfoForm";
 import ProfilePictureUpload from "./ProfilePictureUpload";
-import { User, ShieldCheck } from "lucide-react";
+import { User, ShieldCheck, AlertTriangle, Loader2 } from "lucide-react";
+import { useAuth } from "../auth/useAuth";
+import { useNavigate } from "react-router";
+import { sendVerifyOtp } from "../auth/authService";
+import { useState } from "react";
 
 function ProfileSetting() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [isSending, setIsSending] = useState(false);
+
+  const handleVerifyClick = async () => {
+    if (user?.isAccountVerified) return;
+    setIsSending(true);
+    try {
+      await sendVerifyOtp();
+      navigate("/verify-email");
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   return (
     <div className="p-6 sm:p-8 rounded-2xl bg-white border border-[#2E365A]/15 backdrop-blur-xl shadow-sm space-y-6">
       <div className="flex items-center justify-between border-b border-[#2E365A]/15 pb-6">
@@ -20,9 +41,25 @@ function ProfileSetting() {
             </p>
           </div>
         </div>
-        <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#BD6C73]/10 text-[#BD6C73] border border-[#BD6C73]/30">
-          <ShieldCheck className="w-3.5 h-3.5" /> Verified Account
-        </span>
+
+        {user?.isAccountVerified ? (
+          <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#BD6C73]/10 text-[#BD6C73] border border-[#BD6C73]/30">
+            <ShieldCheck className="w-3.5 h-3.5" /> Verified Account
+          </span>
+        ) : (
+          <button
+            onClick={handleVerifyClick}
+            disabled //{isSending}
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-orange-500/10 text-orange-600 border border-orange-500/30 hover:bg-orange-500/20 transition-colors cursor-pointer"
+          >
+            {isSending ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <AlertTriangle className="w-3.5 h-3.5" />
+            )}
+            {isSending ? "Sending..." : "Unverified - Click to Verify"}
+          </button>
+        )}
       </div>
 
       <div className="flex flex-col md:flex-row gap-8 items-start">

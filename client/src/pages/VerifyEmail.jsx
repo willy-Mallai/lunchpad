@@ -21,7 +21,7 @@ export default function VerifyEmail() {
     try {
       await verifyEmail(user?.email, otp);
       setSuccess("Email verified successfully! Redirecting...");
-      setTimeout(() => navigate("/dashboard"), 1500);
+      setTimeout(() => window.location.href = "/dashboard", 1500);
     } catch (err) {
       setError(err.message);
     } finally {

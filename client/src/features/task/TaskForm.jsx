@@ -15,7 +15,6 @@ function TaskForm() {
 
     try {
       const newTask = await addTask(title, priority);
-      console.log(newTask);
 
       dispatch({ type: "addTask", payload: newTask });
       setTitle("");

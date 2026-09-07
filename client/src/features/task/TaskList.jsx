@@ -22,7 +22,7 @@ function TaskList({ task, isEditingId, setIsEditingId }) {
   async function handleDelete(taskId) {
     try {
       const data = await deleteTask(taskId);
-      console.log(data);
+
       dispatch({ type: "deleteTask", payload: data });
     } catch (err) {
       console.log(err.message);

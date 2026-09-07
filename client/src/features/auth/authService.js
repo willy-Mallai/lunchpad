@@ -1,5 +1,5 @@
 import axios from "axios"; // Assuming you'll use axios, but fetch() is fine too!
-const API_URL = (import.meta.env.VITE_API_URL || "") + "/auth";
+const API_URL = import.meta.env.VITE_API_URL + "/auth";
 
 export const registerUser = async (name, email, password) => {
   try {

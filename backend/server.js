@@ -27,22 +27,11 @@ app.use(cookieParser());
 
 const Port = process.env.PORT || 8080;
 
-const path = require("path");
-
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/task", taskRouter);
 app.use("/event", eventRouter);
 app.use("/roadmap", roadmapRouter);
-
-// Serve frontend static files in production
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../client/dist")));
-
-  app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "../client/dist", "index.html"));
-  });
-}
 
 async function startServer() {
   try {

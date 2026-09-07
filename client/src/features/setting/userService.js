@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Notice this is pointing to `/user` instead of `/auth`!
-const API_URL = (import.meta.env.VITE_API_URL || "") + "/user";
+const API_URL = import.meta.env.VITE_API_URL + "/user";
 
 // Fetch the user's profile data
 // Fetch the user's profile data

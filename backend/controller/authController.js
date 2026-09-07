@@ -32,17 +32,24 @@ const register = async (req, res) => {
 
     // 5. Hash the password using bcrypt.hash()
     const hashedPassword = await bcrypt.hash(password, 10);
-    // 6. Create a new user instance using your userModel and the hashed password
+    
+    // 6. Generate a random 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // 7. Create a new user instance using your userModel and the hashed password
     const newUser = await userModel.create({
       name,
       email,
       password: hashedPassword,
+      verifyOtp: otp,
+      verifyOtpExpireAt: Date.now() + 15 * 60 * 1000,
     });
 
     // 8. Generate a JWT token using the new user's ID
     const token = await jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
+    
     // 9. Set the token as an httpOnly cookie
     res.cookie("token", token, {
       httpOnly: true,
@@ -51,10 +58,18 @@ const register = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    // 10. Return a success response
+    // 10. Attempt to send the OTP email automatically
+    try {
+      await sendVerifyOtpEmail(newUser.email, otp);
+    } catch (emailError) {
+      console.log("Email failed to send during registration, but user was created:", emailError.message);
+      // We don't throw here because we still want the registration to succeed.
+    }
+
+    // 11. Return a success response
     res.status(201).json({
       success: true,
-      message: "Register Successfully",
+      message: "Register Successfully. Please check your email for the OTP.",
       email: newUser.email,
     });
   } catch (error) {

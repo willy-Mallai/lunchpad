@@ -14,7 +14,7 @@ app.use(express.json());
 const allowedOrigins = [
   "http://localhost:5175",
   process.env.FRONTEND_URL,
-  "http://localhost:5173",
+
   process.env.ADMIN_FRONTEND_URL,
 ];
 app.use(

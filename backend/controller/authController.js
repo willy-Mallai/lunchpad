@@ -41,7 +41,7 @@ const register = async (req, res) => {
     });
 
     // 8. Generate a JWT token using the new user's ID
-    const token = await jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
 
@@ -104,7 +104,7 @@ const login = async (req, res) => {
     }
 
     // 7. Generate a JWT token using the user's ID
-    const token = await jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
 
@@ -276,9 +276,11 @@ const isAuthenticated = async (req, res) => {
     // 1. Since they made it here, they are definitely authenticated!
     const user = await userModel.findById(req.userId);
     if (!user) {
-      return res.status(401).json({ success: false, message: "User not found" });
+      return res
+        .status(401)
+        .json({ success: false, message: "User not found" });
     }
-    
+
     // Simply return a 200 success response with the user data
     res.json({
       success: true,

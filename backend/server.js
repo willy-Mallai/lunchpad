@@ -7,10 +7,16 @@ const userRoutes = require("./routes/userRoute");
 const taskRouter = require("./routes/taskRoute");
 const eventRouter = require("./routes/eventRoute");
 const roadmapRouter = require("./routes/roadmapRoute");
+const adminRouter = require("./routes/adminRoute");
 require("dotenv").config();
 const app = express();
 app.use(express.json());
-const allowedOrigins = ["http://localhost:5175", process.env.FRONTEND_URL];
+const allowedOrigins = [
+  "http://localhost:5175",
+  process.env.FRONTEND_URL,
+  "http://localhost:5173",
+  process.env.ADMIN_RONTEND_URL
+];
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -32,6 +38,7 @@ app.use("/user", userRoutes);
 app.use("/task", taskRouter);
 app.use("/event", eventRouter);
 app.use("/roadmap", roadmapRouter);
+app.use("/admin", adminRouter);
 
 async function startServer() {
   try {

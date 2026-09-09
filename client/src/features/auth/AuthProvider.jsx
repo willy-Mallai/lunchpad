@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { loginUser, registerUser, logoutUser, checkAuthSession } from "./authService";
+import {
+  loginUser,
+  registerUser,
+  logoutUser,
+  checkAuthSession,
+} from "./authService";
 import { AuthContext } from "./useAuth";
 
 export function AuthProvider({ children }) {
@@ -13,9 +18,10 @@ export function AuthProvider({ children }) {
       try {
         // If they have a valid cookie, this will succeed!
         const data = await checkAuthSession();
-        setUser(data); 
+        setUser(data);
       } catch (err) {
         // If the cookie is expired or missing, this fails and they stay logged out
+        console.log(err.message);
         setUser(null);
       } finally {
         setIsLoading(false);
@@ -68,7 +74,17 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, error, login, register, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isLoading,
+        error,
+        login,
+        register,
+        logout,
+        isAuthenticated: !!user,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
